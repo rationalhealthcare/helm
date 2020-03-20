@@ -12,11 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: 'Deploy'
-      uses: 'deliverybot/helm@v1'
+    - name: Deliverybot Helm Action
+      uses: deliverybot/helm@v1.5.0
       with:
         release: 'nginx'
-        namespace: 'default'
+        namespace: 'kergiva2'
         chart: 'app'
         token: '${{ github.token }}'
         values: |
