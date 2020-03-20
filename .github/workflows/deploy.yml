@@ -1,6 +1,10 @@
 # .github/workflows/deploy.yml
 name: Deploy
-on: ['deployment']
+
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   deployment:
