@@ -1,0 +1,4 @@
+# View examples and documentation at https://deliverybot.dev/docs/
+uat:
+  environment: uat
+  production_environment: false
