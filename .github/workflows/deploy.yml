@@ -1,0 +1,73 @@
+# .github/workflows/deploy.yml
+name: Deploy
+on: ['deployment']
+
+jobs:
+  deployment:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: 'Deploy'
+      uses: 'deliverybot/helm@v1'
+      with:
+        release: 'nginx'
+        namespace: 'default'
+        chart: 'app'
+        token: '${{ github.token }}'
+        values: |
+          replicaCount: 1
+
+          image:
+            repository: docker.pkg.github.com/rturnbull/vuetest2/kergiva-web
+            tag: latest
+            pullPolicy: Always
+
+          imagePullSecrets:
+            - regcred
+          nameOverride: ""
+          fullnameOverride: ""
+
+          serviceAccount:
+            create: true
+            name: kergiva
+
+          podSecurityContext:
+            fsGroup: 2000
+
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+
+          service:
+            type: LoadBalancer
+            port: 80
+
+          ingress:
+            enabled: false
+            annotations: {}
+            hosts:
+              - host: chart-example.local
+                paths: []
+            tls: []
+            
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+          nodeSelector: {}
+
+          tolerations: []
+
+          affinity: {}
+
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
