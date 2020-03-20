@@ -74,4 +74,4 @@ jobs:
           affinity: {}
 
       env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+        KUBECONFIG_FILE: '${{ secrets.k8s_kergiva_admin }}'
