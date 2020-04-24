@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.pkg.github.com/rationalhealthcare/vuetest2/kergiva-web
+  repository: docker.pkg.github.com/rationalhealthcare/kgweb/kgweb
   tag: latest
   pullPolicy: Always
 
@@ -15,11 +15,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: kergiva
+  name: kergiva-admin
 
 podSecurityContext:
   fsGroup: 1000
