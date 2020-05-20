@@ -1,0 +1,95 @@
+# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deployment:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Deliverybot Helm Action
+      uses: deliverybot/helm@v1.5.0
+      with:
+        release: 'nginx'
+        namespace: 'kergiva2'
+        chart: 'app'
+        token: '${{ github.token }}'
+        values: |
+          replicaCount: 1
+
+          image:
+            repository: docker.pkg.github.com/rturnbull/vuetest2/kergiva-web
+            tag: latest
+            pullPolicy: Always
+
+          imagePullSecrets:
+            - regcred
+          nameOverride: ""
+          fullnameOverride: ""
+
+          serviceAccount:
+            create: true
+            name: kergiva
+
+          podSecurityContext:
+            fsGroup: 2000
+
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+
+          service:
+            type: LoadBalancer
+            port: 80
+
+          ingress:
+            enabled: false
+            annotations: {}
+            hosts:
+              - host: chart-example.local
+                paths: []
+            tls: []
+            
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+          nodeSelector: {}
+
+          tolerations: []
+
+          affinity: {}
+
+      env:
+        KUBECONFIG_FILE: |
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lRZFdTc3psdFZ2alBranV6Ym5QSXYyVEFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlRNVptUTJNbUkwWWkwM056Y3lMVFF4TjJFdFlURXhOUzFsWkRsaU9EZ3lNelk1WTJFdwpIaGNOTWpBd01qQTVNVFF4TnpNMFdoY05NalV3TWpBM01UVXhOek0wV2pBdk1TMHdLd1lEVlFRREV5UTVabVEyCk1tSTBZaTAzTnpjeUxUUXhOMkV0WVRFeE5TMWxaRGxpT0RneU16WTVZMkV3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUM5aGZ1RGJDaHUrWG03enpUcWIyempRb24xWDdjcytmRkQ3Qk9EQk92cgo3WlZIdVF5NUtub1ZtWHdxUXljUlYzSjYxQlNHNXlRU0d4b2R1NGI4ZjkyQmwwd0xnb1VTTmExT1R2VWNTVlJ3CkJPNUEydXRHOElvblNDOEh6TG9rV0hERUZ1R3pqajlZZFZyckhhdHl4WnJRR2RMcFpNMUlSRXNxbm42T1VZYXgKelgzV2lMZlpPYXUzaElsRFJJaE5wMVd1UnRqS29yOFI2RWNBclBFTVdIVlE4UEpSYWEyM2hpL2MwNitEZFFVOQpGemUzUE5jR09DbEFoWDZGSVhNUWtKckNTeVp4bGErOUFJU2xlSTZqYlJML245a2ZzTzc2blNkWTVPanpiMnQ3Ck9sdGgrZ2U1T2xLbXQ4VXpXSW5PYlJ2VHNzdTVWMEhydnRNTVh4OUJoejhCQWdNQkFBR2pJekFoTUE0R0ExVWQKRHdFQi93UUVBd0lDQkRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFCWgpEWEFWayt2VVNrTDUybVlpeldrZDVaZDV5ZlpMSGFMeEtBWHdZcTV2ekF3SkpZN0NzSTYxaHJYTXhQYXk2VHV3CktVZTFpZDFtU3ZXQWx6YlI0N284c1lDY1JJeVJZaHgwck1Xa0Rpa1RXQ290Vkh2V2czTURRM2Z0RjZSSFVsYnEKK1BQVGVHdFRYMHQzVVh1V2lvRDJJOWFDQUdybjBRQmVXWm85ZHNPc3A1RW9iTkVKR1lqNTdydFFWamhRdEU4egpPcVo3N1pwWFVmK3hjSVFHQ3pUZWh0eTNuVVo5K1pjcTNhcHlrc3Joc1QweVcvQ3dFY2ppVU1QSWhETzVDemFxCnZnTVRGTkhhaTExdytmUGNMSGFKQ3V1eXRoSmVjdzY4WDJFZ3p3dEpCMFFuejNVNVBjUkdLc1FjakpiaTNDaW4Kdnl4OTlpem9CZ1lYK3F4SlA5SDYKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+              server: https://35.226.122.249
+            name: gke_kubebull_us-central1-a_standard-cluster-1
+          contexts:
+          - context:
+              cluster: gke_kubebull_us-central1-a_standard-cluster-1
+              user: gke_kubebull_us-central1-a_standard-cluster-1
+            name: gke_kubebull_us-central1-a_standard-cluster-1
+          current-context: gke_kubebull_us-central1-a_standard-cluster-1
+          kind: Config
+          preferences: {}
+          users:
+          - name: gke_kubebull_us-central1-a_standard-cluster-1
+            user:
+              token: '${{ secrets.k8s_kergiva_admin }}'
