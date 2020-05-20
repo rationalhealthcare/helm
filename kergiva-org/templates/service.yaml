@@ -1,0 +1,23 @@
+{{- range $deployment := .Values.deployments }}
+{{- range $endpoint := $deployment.endpoints }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ first $endpoint.hosts | replace "." "-" }}-{{ $endpoint.container_port }}"
+  namespace: {{ $.Release.Namespace }}
+  labels:
+{{ include "kergiva.labels" $ | indent 4 }}
+spec:
+  type: "{{ if $endpoint.create_ingress }}NodePort{{ else }}ClusterIP{{ end }}"
+  ports:
+    - port: {{ $endpoint.container_port }}
+      targetPort: "{{ first $endpoint.hosts | replace "." "-" }}-{{ $endpoint.container_port }}"
+      protocol: {{ $endpoint.protocol }}
+      name: "{{ first $endpoint.hosts | replace "." "-" }}-{{ $endpoint.container_port }}"
+  selector:
+    app.kubernetes.io/name: {{ $deployment.name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+
+{{- end }}
+{{- end }}

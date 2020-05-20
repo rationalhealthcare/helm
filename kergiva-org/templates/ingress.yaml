@@ -1,0 +1,36 @@
+{{- range $deployment := .Values.deployments }}
+{{- range $endpoint := $deployment.endpoints }}
+---
+{{- if semverCompare ">=1.14-0" $.Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: "{{ $deployment.name }}-ingress"
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "kergiva.name" $ }}
+    helm.sh/chart: {{ include "kergiva.chart" $ }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+  annotations:
+  {{ toYaml $.Values.ingress_annotations | nindent 4 }}
+spec:
+  rules:
+    {{- range $endpoint.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+        - backend:
+            serviceName: "{{ first $endpoint.hosts | replace "." "-" }}-{{ $endpoint.container_port }}"
+            servicePort: {{ $endpoint.container_port }}
+    {{- end }}
+  tls:
+    - hosts:
+      {{- range $endpoint.hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: "{{ $deployment.name }}.local-tls"
+{{- end }}
+{{- end }}

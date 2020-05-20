@@ -1,0 +1,89 @@
+{{- range .Values.deployments }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+{{ include "kergiva.labels" $ | indent 4 }}
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .name }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .name }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+    spec:
+      {{- if .image.pull_secret }}
+      imagePullSecrets:
+        - name: {{ .image.pull_secret }}
+      {{- end }}
+      serviceAccountName: default
+      {{- if .security.pod_fs_group }}
+      securityContext:
+        fsGroup: {{ .security.pod_fs_group }}
+      {{- end }}
+      {{- range .init_containers }}
+      initContainers:
+        - {{- toYaml . | nindent 10 }}
+          securityContext:
+            {{- template "security.context" }}
+      {{- end }}
+      containers:
+        - name: {{ $.Chart.Name }}
+          securityContext:
+            {{- template "security.context" }}
+          image: "{{ .image.repo }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.pull_policy }}
+          env:
+            {{ range $key, $value := .environment_variables }}
+            - name: {{ $key | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
+          ports:
+            {{- range .endpoints }}
+            - name: "{{ first .hosts | replace "." "-" }}-{{ .container_port }}"
+              containerPort: {{ .container_port }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .probes.liveness.path | quote }}
+              port: {{ .probes.liveness.port }}
+          readinessProbe:
+            httpGet:
+              path: {{ .probes.readiness.path | quote }}
+              port: {{ .probes.readiness.port }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          volumeMounts:
+          {{- range $key, $value := .volume_mounts }}
+            - name: {{ $key | quote }}
+              mountPath: {{ $value | quote }}
+          {{- end }}
+      
+    {{- with $.Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+
+    {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+
+    {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+
+    {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}
