@@ -59,7 +59,7 @@ deployments:
   - name: kergiva-org-app
     replicas: 1
     image:
-      repo: docker.pkg.github.com/rationalhealthcare/vuetest2/kergiva-web
+      repo: docker.pkg.github.com/rationalhealthcare/vuetest2/kergiva-app
       tag: latest
       pull_poicy: Always
       pull_secret: regcred
