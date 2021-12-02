@@ -1,0 +1,19 @@
+database_name: mysql-db
+database_version: "8.0.27"
+storage_class: kube-rook
+
+### Ingress Annotations Stuff ###
+ingress_annotations:
+  kubernetes.io/ingress.class: nginx
+  cert-manager.io/cluster-issuer: letsencrypt-prod
+
+### Database resource constraints ###
+resources_request:
+  cpu: 1
+  memory: 8Gi
+  storage: 1Gi
+resources_limit:
+  cpu: 2
+  memory: 10Gi
+  storage: 10Gi
+  

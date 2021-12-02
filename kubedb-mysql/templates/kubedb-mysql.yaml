@@ -1,0 +1,21 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MySQL
+metadata:
+  name: {{ .Values.database_name }}
+spec:
+  version: {{ .Values.database_version }}
+  storageType: Durable
+  storage:
+    storageClassName: {{ .Values.storage_class }}
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        cpu: {{ .Values.resources_request.cpu }}
+        memory: {{ .Values.resources_request.memory }}
+        storage: {{ .Values.resources_request.storage }}
+      limits:
+        cpu: {{ .Values.resources_limit.cpu }}
+        memory: {{ .Values.resources_limit.memory }}
+        storage: {{ .Values.resources_limit.storage }}
+  terminationPolicy: DoNotTerminate
