@@ -11,11 +11,28 @@ spec:
     - ReadWriteOnce
     resources:
       requests:
-        cpu: {{ .Values.resources_request.cpu }}
-        memory: {{ .Values.resources_request.memory }}
         storage: {{ .Values.resources_request.storage }}
-      limits:
-        cpu: {{ .Values.resources_limit.cpu }}
-        memory: {{ .Values.resources_limit.memory }}
-        storage: {{ .Values.resources_limit.storage }}
+  podTemplate:
+    annotations:
+      passMe: ToDatabasePod
+    controller:
+      annotations:
+        passMe: ToStatefulSet
+    spec:
+      resources:
+        requests:
+          cpu: {{ .Values.resources_request.cpu }}
+          memory: {{ .Values.resources_request.memory }}
+        limits:
+          cpu: {{ .Values.resources_limit.cpu }}
+          memory: {{ .Values.resources_limit.memory }}
+  serviceTemplate:
+    annotations:
+      passMe: ToService
+    spec:
+      type: NodePort
+      ports:
+      - name:  http
+        port:  9200
+        targetPort: http
   terminationPolicy: DoNotTerminate
