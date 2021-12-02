@@ -1,0 +1,20 @@
+---
+apiVersion: opnsense.turnbros.app/v1alpha1
+kind: FirewallFilter
+metadata:
+  name: {{ .Values.database_name }}
+spec:
+  action: pass
+  api_secret_name: opnsense-device-secret
+  api_secret_namespace: default
+  description: Permit internet ingress for NPI DB on TCP port 30995
+  destination_net: arroyo-cluster-nodes
+  destination_port: 30995
+  direction: in
+  enabled: true
+  interface:
+  - wan
+  protocol: TCP
+  source_net: any
+  source_port: 0
+  state: present
