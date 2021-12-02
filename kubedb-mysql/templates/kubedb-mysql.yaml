@@ -26,13 +26,4 @@ spec:
         limits:
           cpu: {{ .Values.resources_limit.cpu }}
           memory: {{ .Values.resources_limit.memory }}
-  serviceTemplate:
-    annotations:
-      passMe: ToService
-    spec:
-      type: NodePort
-      ports:
-      - name:  http
-        port:  9200
-        targetPort: http
   terminationPolicy: DoNotTerminate
