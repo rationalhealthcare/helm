@@ -12,6 +12,19 @@ spec:
     resources:
       requests:
         storage: {{ .Values.resources_request.storage }}
+  requireSSL: true
+  tls:
+    issuerRef:
+      apiGroup: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    certificates:
+    - alias: server
+      subject:
+        organizations:
+        - kubedb:server
+      dnsNames:
+      - "npidb.arroyo.turnbros.app"
   podTemplate:
     spec:
       resources:
@@ -21,12 +34,5 @@ spec:
         limits:
           cpu: {{ .Values.resources_limit.cpu }}
           memory: {{ .Values.resources_limit.memory }}
-  serviceTemplates:
-  - spec:
-    type: NodePort
-    ports:
-    - name:  primary
-      port:  3306
-      targetPort: primary
   terminationPolicy: DoNotTerminate
 
