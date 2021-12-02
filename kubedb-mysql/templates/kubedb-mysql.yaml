@@ -13,11 +13,6 @@ spec:
       requests:
         storage: {{ .Values.resources_request.storage }}
   podTemplate:
-    annotations:
-      passMe: ToDatabasePod
-    controller:
-      annotations:
-        passMe: ToStatefulSet
     spec:
       resources:
         requests:
