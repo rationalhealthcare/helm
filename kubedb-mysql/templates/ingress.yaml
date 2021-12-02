@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.database_name }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: npidb.arroyo.turnbros.app
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.database_name }}
+            port:
+              number: 3306
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - npidb.arroyo.turnbros.app
+    secretName: npidb-ingress-tls
