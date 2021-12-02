@@ -22,11 +22,11 @@ spec:
           cpu: {{ .Values.resources_limit.cpu }}
           memory: {{ .Values.resources_limit.memory }}
   serviceTemplates:
-    spec:
-      type: NodePort
-      ports:
-      - name:  primary
-        port:  3306
-        targetPort: primary
+  - spec:
+    type: NodePort
+    ports:
+    - name:  primary
+      port:  3306
+      targetPort: primary
   terminationPolicy: DoNotTerminate
 
