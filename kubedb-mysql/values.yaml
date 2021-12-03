@@ -15,5 +15,5 @@ resources_request:
 resources_limit:
   cpu: 2
   memory: 10Gi
-  storage: 20Gi
+  storage: 40Gi
   
