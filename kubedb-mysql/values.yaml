@@ -11,9 +11,9 @@ ingress_annotations:
 resources_request:
   cpu: 1
   memory: 8Gi
-  storage: 1Gi
+  storage: 40Gi
 resources_limit:
   cpu: 2
   memory: 10Gi
-  storage: 10Gi
+  storage: 20Gi
   
